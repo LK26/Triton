@@ -4,10 +4,12 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: macos-latest
+    # macos-13 = x86
+    # macos-14 = arm (M1)
+    runs-on: macos-12
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.8', '3.9', '3.10']
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,14 +35,15 @@ jobs:
           unzip z3-4.8.17-x64-osx-10.16.zip
           sudo python -m pip install z3-solver==4.8.17.0
 
-      - name: Download and build GMP
-        run: |
-          wget https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
-          tar xvf gmp-6.2.1.tar.xz
-          cd gmp-6.2.1/
-          ./configure --with-pic
-          make
-          make check
+      # NOTE: Do we really need this?
+      #- name: Download and build GMP
+      #  run: |
+      #    wget https://ftp.gnu.org/gnu/gmp/gmp-6.2.1.tar.xz
+      #    tar xvf gmp-6.2.1.tar.xz
+      #    cd gmp-6.2.1/
+      #    ./configure --with-pic
+      #    make
+      #    make check
 
       - name: Install Ninja
         run: |
@@ -54,7 +57,7 @@ jobs:
         run: |
           git clone https://github.com/bitwuzla/bitwuzla.git
           cd bitwuzla
-          git checkout -b 0.2.0 0.2.0
+          git checkout -b 0.4.0 0.4.0
           python ./configure.py --shared --prefix $(pwd)/install
           cd build
           sudo ninja install
@@ -71,7 +74,7 @@ jobs:
 
       - name: Install Unicorn
         run: |
-          sudo python -m pip install unicorn==2.0.0
+          sudo python -m pip install unicorn==2.0.1
 
       - name: Install LIEF
         run: |
